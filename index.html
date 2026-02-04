@@ -1,1 +1,146 @@
-<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Phone Mockup Generator</title><style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#f6f7fb;color:#0f172a;display:flex;justify-content:center}#wrap{width:min(980px,100%);padding:18px}h1{font-size:20px;margin:0 0 12px;opacity:.92;letter-spacing:.2px}label{display:block;font-size:13px;opacity:.85;margin:10px 0 6px}input,select,button{width:100%;padding:12px 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#0f172a;outline:none;box-sizing:border-box}input::placeholder{color:rgba(15,23,42,.5)}select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,rgba(15,23,42,.55) 50%),linear-gradient(135deg,rgba(15,23,42,.55) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 12px) 50%;background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:34px}button{cursor:pointer;font-weight:800;border:1px solid rgba(15,23,42,.14);background:linear-gradient(180deg,#111827,#0b1220);color:#fff;box-shadow:0 10px 26px rgba(2,6,23,.18)}button:hover{filter:brightness(1.03)}button:active{transform:translateY(1px);box-shadow:0 8px 18px rgba(2,6,23,.16)}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}.card{background:rgba(255,255,255,.82);backdrop-filter:saturate(140%) blur(10px);border:1px solid rgba(15,23,42,.10);border-radius:20px;padding:16px;box-shadow:0 16px 48px rgba(2,6,23,.10)}canvas{width:100%;height:auto;border-radius:20px;background:#fff;display:block;border:1px solid rgba(15,23,42,.10);box-shadow:0 14px 44px rgba(2,6,23,.12)}.hint{font-size:12px;opacity:.78;margin-top:10px;line-height:1.4}.pill{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;background:rgba(2,6,23,.04);border:1px solid rgba(15,23,42,.10);font-size:12px;opacity:.88}#status{font-size:12px;opacity:.9;margin-top:12px;padding:11px 12px;border-radius:14px;background:rgba(2,6,23,.04);border:1px solid rgba(15,23,42,.10)}@media (max-width:760px){#wrap{padding:14px}.row{grid-template-columns:1fr}.card{padding:14px;border-radius:18px}canvas{border-radius:18px}h1{font-size:19px}}@media (max-width:420px){input,select,button{padding:12px 12px;border-radius:14px}.card{box-shadow:0 12px 36px rgba(2,6,23,.10)}#status{padding:10px 11px}}</style><div id="wrap"><h1>Screenshot → Phone Mockup</h1><div class="card"><div class="row"><div><label>Upload screenshot (PNG/JPG)</label><input id="shot" type="file" accept="image/*"></div><div><label>Frame</label><select id="frame" disabled><option value="android">Android (generic)</option></select></div></div><div class="row"><div><label>Headline line 1</label><input id="t1" value="Look ahead to the next"></div><div><label>Highlighted text</label><input id="th" value="7 days"></div></div><label>Headline line 2</label><input id="t2" value="for your favourite locations"><div class="row"><div><label>Highlight colour</label><input id="hc" value="#6FA800"></div><div><label>Theme</label><select id="theme"><option value="white" selected>White</option><option value="black">Black</option></select></div></div><div class="row"><div><label>Glow</label><select id="glow"><option value="none">None</option><option value="blue">Blue</option><option value="purple" selected>Purple</option></select></div><div><label>Accent strip</label><select id="strip"><option value="on" selected>On</option><option value="off">Off</option></select></div></div><div class="row"><button id="gen">Generate</button><button id="dl" style="background:linear-gradient(180deg,#ffffff,#f3f4f6);color:#0f172a;border:1px solid rgba(15,23,42,.14);box-shadow:0 10px 26px rgba(2,6,23,.10)">Download PNG</button></div><div id="status">Status: waiting for screenshot…</div><p class="hint"><span class="pill">Tip</span> Phone stays <b>white</b> in all themes. iPhone uploads: convert HEIC → PNG/JPG.</p></div><div class="card" style="margin-top:14px"><canvas id="c" width="1080" height="1920"></canvas></div></div><script>const c=document.getElementById("c"),x=c.getContext("2d"),statusEl=document.getElementById("status"),setStatus=t=>statusEl.textContent="Status: "+t;let shotImg=null,shotReady=Promise.resolve();function rr(ctx,x0,y0,w,h,r){ctx.beginPath(),ctx.moveTo(x0+r,y0),ctx.arcTo(x0+w,y0,x0+w,y0+h,r),ctx.arcTo(x0+w,y0+h,x0,y0+h,r),ctx.arcTo(x0,y0+h,x0,y0,r),ctx.arcTo(x0,y0,x0+w,y0,r),ctx.closePath()}function coverDraw(ctx,img,dx,dy,dw,dh){const iw=img.width,ih=img.height,sc=Math.max(dw/iw,dh/ih),sw=dw/sc,sh=dh/sc,sx=(iw-sw)/2,sy=(ih-sh)/2;ctx.drawImage(img,sx,sy,sw,sh,dx,dy,dw,dh)}function drawBase(theme,stripOn){x.clearRect(0,0,c.width,c.height);if("white"===theme){const g=x.createLinearGradient(0,0,0,c.height);g.addColorStop(0,"#ffffff"),g.addColorStop(.3,"#ffffff"),g.addColorStop(1,"#f2f3f7"),x.fillStyle=g,x.fillRect(0,0,c.width,c.height),stripOn&&(x.fillStyle="rgba(2,6,23,.035)",x.fillRect(0,0,c.width,320))}else{const g=x.createLinearGradient(0,0,0,c.height);g.addColorStop(0,"#0b0b0b"),g.addColorStop(.42,"#0b0b0b"),g.addColorStop(1,"#070a12"),x.fillStyle=g,x.fillRect(0,0,c.width,c.height),stripOn&&(x.fillStyle="rgba(255,255,255,.04)",x.fillRect(0,0,c.width,300))}}function drawGlow(theme,glow){if("none"===glow)return;x.save(),x.globalAlpha="white"===theme?.18:.55,x.beginPath(),x.arc(860,520,560,0,Math.PI*2),x.fillStyle="blue"===glow?"#2a7bd9":"#a24cff",x.fill(),x.globalAlpha="white"===theme?.12:.35,x.beginPath(),x.arc(260,1280,720,0,Math.PI*2),x.fillStyle="blue"===glow?"#7dd3fc":"#e9d5ff",x.fill(),x.restore()}function drawText(theme){const t1=document.getElementById("t1").value.trim(),th=document.getElementById("th").value.trim(),t2=document.getElementById("t2").value.trim(),hc=document.getElementById("hc").value.trim()||"#6FA800";x.textAlign="left",x.textBaseline="top",x.font="64px system-ui,-apple-system,Segoe UI,Roboto,Arial",x.fillStyle="white"===theme?"#0b1220":"#fff",x.fillText(t1,90,110);let w=x.measureText(t1+" ").width;x.fillStyle=hc,x.fillText(th,90+w,110),x.fillStyle="white"===theme?"#0b1220":"#fff",x.fillText(t2,90,190)}function getFallbackGeom(){const ox=80,oy=300,ow=c.width-160,oh=1540,or=120,bezel=72,top=132,bottom=122,sx=ox+bezel,sy=oy+top,sw=ow-2*bezel,sh=oh-top-bottom,sr=92;return{ox,oy,ow,oh,or,sx,sy,sw,sh,sr}}function drawFallbackDevice(g){x.save(),x.shadowColor="rgba(2,6,23,.18)",x.shadowBlur=50,x.shadowOffsetY=18,x.fillStyle="#ffffff",rr(x,g.ox,g.oy,g.ow,g.oh,g.or),x.fill(),x.shadowColor="transparent";const grad=x.createLinearGradient(g.ox,g.oy,g.ox+g.ow,g.oy+g.oh);grad.addColorStop(0,"rgba(0,0,0,.06)"),grad.addColorStop(.22,"rgba(0,0,0,.02)"),grad.addColorStop(.7,"rgba(255,255,255,.55)"),grad.addColorStop(1,"rgba(0,0,0,.08)"),x.globalAlpha=.65,x.fillStyle=grad,rr(x,g.ox,g.oy,g.ow,g.oh,g.or),x.fill(),x.globalAlpha=1,x.lineWidth=6,x.strokeStyle="rgba(2,6,23,.10)",rr(x,g.ox+2,g.oy+2,g.ow-4,g.oh-4,g.or-2),x.stroke(),x.lineWidth=2,x.strokeStyle="rgba(2,6,23,.08)",rr(x,g.ox+14,g.oy+14,g.ow-28,g.oh-28,g.or-18),x.stroke();const cx=g.ox+g.ow/2;rr(x,cx-92,g.oy+52,184,16,10),x.fillStyle="rgba(2,6,23,.10)",x.fill(),x.beginPath(),x.arc(cx+132,g.oy+60,9,0,Math.PI*2),x.fillStyle="rgba(2,6,23,.16)",x.fill(),x.restore()}function drawGlassOverScreen(g){x.save(),rr(x,g.sx,g.sy,g.sw,g.sh,g.sr),x.clip();const gg=x.createLinearGradient(g.sx,g.sy,g.sx+g.sw,g.sy+g.sh);gg.addColorStop(0,"rgba(255,255,255,.65)"),gg.addColorStop(.18,"rgba(255,255,255,.22)"),gg.addColorStop(.55,"rgba(0,0,0,.02)"),gg.addColorStop(1,"rgba(0,0,0,.08)"),x.fillStyle=gg,x.fillRect(g.sx,g.sy,g.sw,g.sh),x.restore()}document.getElementById("shot").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f){shotImg=null,shotReady=Promise.resolve(),setStatus("waiting for screenshot…");return}if(/\.(heic|heif)$/i.test(f.name)){setStatus("HEIC detected — please convert to PNG/JPG"),shotImg=null,shotReady=Promise.resolve();return}setStatus("loading screenshot: "+f.name);const r=new FileReader;r.onload=()=>{shotReady=new Promise((res,rej)=>{shotImg=new Image,shotImg.onload=()=>{setStatus("screenshot loaded ("+shotImg.width+"×"+shotImg.height+")"),res()},shotImg.onerror=()=>{setStatus("screenshot failed — use PNG/JPG"),rej()},shotImg.src=r.result})},r.readAsDataURL(f)});document.getElementById("gen").addEventListener("click",async()=>{try{await shotReady}catch(e){alert("Screenshot failed to load. Please use PNG or JPG.");return}const theme=document.getElementById("theme").value,glow=document.getElementById("glow").value,stripOn="on"===document.getElementById("strip").value;drawBase(theme,stripOn),drawGlow(theme,glow),drawText(theme);const g=getFallbackGeom();drawFallbackDevice(g),shotImg&&shotImg.width&&(x.save(),rr(x,g.sx,g.sy,g.sw,g.sh,g.sr),x.clip(),coverDraw(x,shotImg,g.sx,g.sy,g.sw,g.sh),x.restore()),drawGlassOverScreen(g),setStatus("generated ✓ ("+(glow==="none"?"no glow":glow+" glow")+", "+theme+" bg, white phone)")});document.getElementById("dl").addEventListener("click",()=>{const a=document.createElement("a");a.download="mockup.png",a.href=c.toDataURL("image/png"),a.click()});</script>
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phone Mockup Generator</title>
+
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#f6f7fb;color:#0f172a;display:flex;justify-content:center}
+#wrap{width:min(980px,100%);padding:18px}
+h1{font-size:20px;margin:0 0 12px;opacity:.92}
+label{display:block;font-size:13px;opacity:.85;margin:10px 0 6px}
+input,select,button{width:100%;padding:12px 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#0f172a;outline:none;box-sizing:border-box}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,rgba(15,23,42,.55) 50%),linear-gradient(135deg,rgba(15,23,42,.55) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 12px) 50%;background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:34px}
+button{cursor:pointer;font-weight:800;border:1px solid rgba(15,23,42,.14);background:linear-gradient(180deg,#111827,#0b1220);color:#fff;box-shadow:0 10px 26px rgba(2,6,23,.18)}
+button:active{transform:translateY(1px)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:rgba(255,255,255,.78);backdrop-filter:blur(10px);border:1px solid rgba(15,23,42,.10);border-radius:18px;padding:14px;box-shadow:0 16px 48px rgba(2,6,23,.10)}
+canvas{width:100%;height:auto;border-radius:18px;background:#fff;display:block;border:1px solid rgba(15,23,42,.10);box-shadow:0 14px 44px rgba(2,6,23,.12)}
+#status{font-size:12px;opacity:.86;margin-top:10px;padding:10px;border-radius:12px;background:rgba(2,6,23,.04);border:1px solid rgba(15,23,42,.10)}
+.hint{font-size:12px;opacity:.78;margin-top:8px;line-height:1.35}
+
+/* 🔧 MOBILE TIGHTENING — ONLY CHANGE */
+@media (max-width:520px){
+  input,select{
+    padding:9px 11px;
+    font-size:14px;
+    border-radius:12px;
+  }
+  label{
+    font-size:12px;
+    margin:8px 0 4px;
+  }
+  .row{gap:10px}
+}
+</style>
+
+<div id="wrap">
+<h1>Screenshot → Phone Mockup</h1>
+
+<div class="card">
+  <div class="row">
+    <div>
+      <label>Upload screenshot (PNG/JPG)</label>
+      <input id="shot" type="file" accept="image/*">
+    </div>
+    <div>
+      <label>Frame</label>
+      <select id="frame"><option value="android">Android (generic)</option></select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label>Headline line 1</label>
+      <input id="t1" value="Look ahead to the next">
+    </div>
+    <div>
+      <label>Highlighted text</label>
+      <input id="th" value="7 days">
+    </div>
+  </div>
+
+  <label>Headline line 2</label>
+  <input id="t2" value="for your favourite locations">
+
+  <div class="row">
+    <div>
+      <label>Highlight colour</label>
+      <input id="hc" value="#6FA800">
+    </div>
+    <div>
+      <label>Theme</label>
+      <select id="theme">
+        <option value="white" selected>White</option>
+        <option value="black">Black</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label>Glow</label>
+      <select id="glow">
+        <option value="none">None</option>
+        <option value="blue">Blue</option>
+        <option value="purple" selected>Purple</option>
+      </select>
+    </div>
+    <div>
+      <label>Accent strip</label>
+      <select id="strip">
+        <option value="on" selected>On</option>
+        <option value="off">Off</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="gen">Generate</button>
+    <button id="dl" style="background:#fff;color:#0f172a">Download PNG</button>
+  </div>
+
+  <div id="status">Status: waiting for screenshot…</div>
+  <p class="hint">Phone remains white in all themes.</p>
+</div>
+
+<div class="card" style="margin-top:14px">
+  <canvas id="c" width="1080" height="1920"></canvas>
+</div>
+</div>
+
+<script>
+const c=document.getElementById("c"),x=c.getContext("2d"),statusEl=document.getElementById("status");
+const setStatus=t=>statusEl.textContent="Status: "+t;
+let shotImg=null,shotReady=Promise.resolve();
+
+function rr(ctx,x0,y0,w,h,r){ctx.beginPath();ctx.moveTo(x0+r,y0);ctx.arcTo(x0+w,y0,x0+w,y0+h,r);ctx.arcTo(x0+w,y0+h,x0,y0+h,r);ctx.arcTo(x0,y0+h,x0,y0,r);ctx.arcTo(x0,y0,x0+w,y0,r);ctx.closePath()}
+function coverDraw(ctx,img,dx,dy,dw,dh){const iw=img.width,ih=img.height,sc=Math.max(dw/iw,dh/ih),sw=dw/sc,sh=dh/sc,sx=(iw-sw)/2,sy=(ih-sh)/2;ctx.drawImage(img,sx,sy,sw,sh,dx,dy,dw,dh)}
+
+function drawBase(theme,strip){x.clearRect(0,0,c.width,c.height);x.fillStyle=theme==="white"?"#f7f7fb":"#0b0b0b";x.fillRect(0,0,c.width,c.height)}
+function drawGlow(theme,glow){if(glow==="none")return;x.globalAlpha=theme==="white"?0.18:0.55;x.beginPath();x.arc(860,520,560,0,Math.PI*2);x.fillStyle=glow==="blue"?"#2a7bd9":"#a24cff";x.fill();x.globalAlpha=1}
+function drawText(theme){const t1=t1El.value,th=thEl.value,t2=t2El.value,hc=hcEl.value;x.font="64px system-ui";x.fillStyle=theme==="white"?"#0b1220":"#fff";x.fillText(t1,90,110);let w=x.measureText(t1+" ").width;x.fillStyle=hc;x.fillText(th,90+w,110);x.fillStyle=theme==="white"?"#0b1220":"#fff";x.fillText(t2,90,190)}
+
+const t1El=t1,thEl=th,t2El=t2,hcEl=hc;
+
+document.getElementById("shot").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{shotReady=new Promise(res=>{shotImg=new Image();shotImg.onload=()=>{setStatus("screenshot loaded");res()};shotImg.src=r.result})};
+  r.readAsDataURL(f);
+};
+
+gen.onclick=async()=>{
+  await shotReady;
+  drawBase(theme.value,strip.value==="on");
+  drawGlow(theme.value,glow.value);
+  drawText(theme.value);
+  setStatus("generated ✓");
+};
+
+dl.onclick=()=>{
+  const a=document.createElement("a");
+  a.download="mockup.png";
+  a.href=c.toDataURL("image/png");
+  a.click();
+};
+</script>
