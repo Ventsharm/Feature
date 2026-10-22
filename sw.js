@@ -1,1 +1,13 @@
-const CACHE_NAME="phone-mockup-generator-v1";const FILES=["./","./index.html","./manifest.webmanifest","./Icon-192.png","./Icon-512.png"];self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>k!==CACHE_NAME?caches.delete(k):null))).then(()=>self.clients.claim()))});self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const copy=res.clone();caches.open(CACHE_NAME).then(c=>c.put(e.request,copy));return res}).catch(()=>caches.match("./index.html"))))});
+/* Retires the old Mockup web app. No offline generator or fetch interception. */
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', event => event.waitUntil((async () => {
+  const scope = self.registration.scope;
+  for (const name of await caches.keys()) {
+    if (name.startsWith('phone-mockup-generator-')) await caches.delete(name);
+  }
+  await self.clients.claim();
+  await self.registration.unregister();
+  for (const client of await self.clients.matchAll({ type: 'window' })) {
+    if (client.url.startsWith(scope)) await client.navigate(client.url);
+  }
+})()));
